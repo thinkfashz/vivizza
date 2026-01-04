@@ -22,18 +22,27 @@ const App: React.FC = () => {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [checkoutProgress, setCheckoutProgress] = useState(0);
 
-  // Audio Refs
-  const popSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'));
-  const successSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3'));
+  // Efectos de Sonido
+  const popSound = useRef<HTMLAudioElement | null>(null);
+  const successSound = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    popSound.current = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
+    successSound.current = new Audio('https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3');
+  }, []);
 
   const playPop = () => {
-    popSound.current.currentTime = 0;
-    popSound.current.play().catch(() => {});
+    if (popSound.current) {
+      popSound.current.currentTime = 0;
+      popSound.current.play().catch(() => {});
+    }
   };
 
   const playSuccess = () => {
-    successSound.current.currentTime = 0;
-    successSound.current.play().catch(() => {});
+    if (successSound.current) {
+      successSound.current.currentTime = 0;
+      successSound.current.play().catch(() => {});
+    }
   };
 
   const addToCart = (pizza: Pizza) => {
@@ -72,7 +81,7 @@ const App: React.FC = () => {
 
   const startWhatsAppCheckout = () => {
     if (orderType === 'delivery' && !address.trim()) {
-      alert("Por favor, introduce tu dirección para el envío en Talca 🍕");
+      alert("Por favor, ingresa tu dirección para el envío en Talca 🍕");
       return;
     }
 
@@ -105,7 +114,7 @@ const App: React.FC = () => {
 
     message += "----------------------------------\n";
     message += `💰 *TOTAL A PAGAR: $${totalCartPrice.toLocaleString('es-CL')}*\n`;
-    message += "🙌 ¡Gracias por elegir el sabor de nuestra tierra!";
+    message += "🙌 ¡Esperamos que disfrutes el auténtico sabor artesanal!";
     
     const encodedMessage = encodeURIComponent(message);
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`, '_blank');
@@ -121,28 +130,33 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#FDFCF0] text-stone-900 selection:bg-[#A61D24]/10 pb-24 md:pb-0 overflow-x-hidden">
       
-      {/* Header Premium */}
+      {/* Header Estilo Next.js */}
       <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-2xl border-b border-stone-100 py-4 shadow-sm">
         <div className="container mx-auto px-6 flex items-center justify-between">
-          <div className="flex items-center gap-4 cursor-pointer" onClick={() => setActiveTab('menu')}>
-            <div className="w-12 h-12 bg-[#A61D24] rounded-2xl flex items-center justify-center shadow-lg shadow-red-100 transform hover:rotate-6 transition-transform">
+          <div className="flex items-center gap-4 cursor-pointer group" onClick={() => setActiveTab('menu')}>
+            <div className="w-12 h-12 bg-[#A61D24] rounded-2xl flex items-center justify-center shadow-lg shadow-red-100 transform group-hover:rotate-6 transition-transform">
               <span className="text-white font-bebas text-3xl pt-1">V</span>
             </div>
             <div>
               <h1 className="text-3xl font-bebas tracking-widest text-stone-900 leading-none">Vivazza</h1>
-              <p className="text-[9px] font-black text-[#A61D24] uppercase tracking-[0.4em]">Talca • Maule</p>
+              <p className="text-[9px] font-black text-[#A61D24] uppercase tracking-[0.4em]">Pizzería • Talca</p>
             </div>
           </div>
           
           <nav className="hidden md:flex items-center gap-10">
-            {['menu', 'custom', 'game', 'history'].map((tab) => (
+            {[
+              { id: 'menu', label: 'Menú' },
+              { id: 'custom', label: 'Armar' },
+              { id: 'game', label: 'Arcade' },
+              { id: 'history', label: 'Nuestra Historia' }
+            ].map((tab) => (
               <button 
-                key={tab}
-                onClick={() => setActiveTab(tab as any)}
-                className={`text-[10px] font-black uppercase tracking-[0.3em] transition-all relative py-2 ${activeTab === tab ? 'text-[#A61D24]' : 'text-stone-400 hover:text-stone-900'}`}
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`text-[10px] font-black uppercase tracking-[0.3em] transition-all relative py-2 ${activeTab === tab.id ? 'text-[#A61D24]' : 'text-stone-400 hover:text-stone-900'}`}
               >
-                {tab === 'game' ? 'Arcade' : tab === 'history' ? 'Nuestra Historia' : tab === 'custom' ? 'Armar' : 'Menú'}
-                {activeTab === tab && <span className="absolute -bottom-1 left-0 w-full h-1 bg-[#A61D24] rounded-full"></span>}
+                {tab.label}
+                {activeTab === tab.id && <span className="absolute -bottom-1 left-0 w-full h-1 bg-[#A61D24] rounded-full"></span>}
               </button>
             ))}
           </nav>
@@ -152,7 +166,7 @@ const App: React.FC = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
             </svg>
             {cart.length > 0 && (
-              <span className="absolute -top-1 -right-1 bg-[#A61D24] text-white text-[10px] font-black w-6 h-6 rounded-full flex items-center justify-center border-2 border-white shadow-xl animate-pulse">
+              <span className="absolute -top-1 -right-1 bg-[#A61D24] text-white text-[10px] font-black w-6 h-6 rounded-full flex items-center justify-center border-2 border-white shadow-xl animate-bounce">
                 {cart.reduce((a, b) => a + b.quantity, 0)}
               </span>
             )}
@@ -160,25 +174,28 @@ const App: React.FC = () => {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="container mx-auto px-6 py-12 md:py-20">
         
         {activeTab === 'menu' && (
           <div className="section-fade-enter space-y-24">
+            {/* Hero Section */}
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-12">
               <div className="max-w-3xl space-y-6">
-                <span className="inline-block bg-yellow-400 text-black px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">Desde el Corazón del Maule</span>
-                <h2 className="text-7xl md:text-9xl font-bebas text-stone-900 leading-[0.85]">Recetas con <br/> <span className="text-[#A61D24] italic">Alma Talquina</span></h2>
+                <span className="inline-block bg-yellow-400 text-black px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">Abierto en el Corazón del Maule</span>
+                <h2 className="text-7xl md:text-9xl font-bebas text-stone-900 leading-[0.85]">Recetas con <br/> <span className="text-[#A61D24] italic">Alma Artesana</span></h2>
                 <p className="text-xl text-stone-500 font-medium leading-relaxed max-w-xl">
-                  Harinas de molinos locales, fermentación de 48 horas y el cariño de nuestra gente en cada porción.
+                  Harinas de molinos locales, fermentación prolongada y el cariño de nuestra gente en cada porción.
                 </p>
               </div>
-              <CalorieDisplay calories={totalCartCalories} label="Balance Energético" />
+              <CalorieDisplay calories={totalCartCalories} label="Vivazza Tracker" />
             </div>
 
-            {/* Reordenamiento: Especialidades Primero para destacar */}
+            {/* Reordenamiento: Especialidades Primero */}
             <div className="space-y-12">
-               <h3 className="text-5xl font-bebas text-stone-900 border-l-8 border-[#A61D24] pl-6 uppercase">Especialidades de la Casa</h3>
+               <div className="flex items-center gap-6">
+                 <h3 className="text-5xl font-bebas text-stone-900 uppercase">Especialidades de la Casa</h3>
+                 <div className="h-px flex-grow bg-stone-100"></div>
+               </div>
                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
                  {SPECIAL_PIZZAS.map(pizza => (
                    <PizzaCard 
@@ -192,8 +209,12 @@ const App: React.FC = () => {
                </div>
             </div>
 
+            {/* Tradicionales */}
             <div className="space-y-12">
-               <h3 className="text-5xl font-bebas text-stone-400 uppercase tracking-widest">Pizzas Tradicionales</h3>
+               <div className="flex items-center gap-6">
+                 <h3 className="text-5xl font-bebas text-stone-400 uppercase tracking-widest">Nuestra Tradición</h3>
+                 <div className="h-px flex-grow bg-stone-100"></div>
+               </div>
                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                  {TRADITIONAL_PIZZAS.map(pizza => (
                    <PizzaCard 
@@ -216,14 +237,14 @@ const App: React.FC = () => {
               const customPizza: Pizza = {
                 id: `custom-${Date.now()}`,
                 name: `Creación Propia`,
-                description: `Masa ${dough.name} diseñada por tu creatividad.`,
+                description: `Masa ${dough.name} diseñada a tu medida.`,
                 price,
                 calories: totalCals,
                 dough,
                 image: 'https://images.unsplash.com/photo-1541745537411-b8046dc6d66c?auto=format&fit=crop&q=80&w=800',
                 type: 'custom',
                 ingredientsList: ings.map(i => i.name),
-                history: 'Una receta exclusiva nacida de tu inspiración en nuestra pizzería.'
+                history: 'Una receta exclusiva nacida de tu inspiración en nuestro laboratorio de sabores.'
               };
               setCart(prev => [...prev, { id: customPizza.id, pizza: customPizza, quantity: 1, customIngredients: ings }]);
               playPop();
@@ -235,32 +256,45 @@ const App: React.FC = () => {
         {activeTab === 'game' && (
           <div className="section-fade-enter max-w-4xl mx-auto py-8 text-center space-y-12">
             <div>
-               <h2 className="text-8xl font-bebas text-stone-900">Arcade <span className="text-[#A61D24]">Zone</span></h2>
-               <p className="text-stone-400 font-bold uppercase tracking-[0.5em] text-[10px]">Demuestra tu destreza mientras horneamos tu pedido.</p>
+               <h2 className="text-8xl font-bebas text-stone-900">Arcade <span className="text-[#A61D24]">Vivazza</span></h2>
+               <p className="text-stone-400 font-bold uppercase tracking-[0.5em] text-[10px]">Corta los ingredientes mientras preparamos tu masa.</p>
             </div>
             <PizzaGame />
           </div>
         )}
 
         {activeTab === 'history' && (
-          <div className="section-fade-enter max-w-4xl mx-auto py-12 space-y-16">
-            <div className="text-center">
-              <h2 className="text-8xl font-bebas text-stone-900 leading-none mb-4">Nuestra <span className="text-[#A61D24]">Herencia</span></h2>
-              <p className="text-stone-400 font-bold uppercase tracking-[0.6em] text-xs">Desde Talca para el mundo</p>
+          <div className="section-fade-enter max-w-5xl mx-auto py-12 space-y-16">
+            <div className="text-center space-y-4">
+              <h2 className="text-8xl font-bebas text-stone-900 leading-none">Nuestra <span className="text-[#A61D24]">Herencia</span></h2>
+              <p className="text-stone-400 font-bold uppercase tracking-[0.6em] text-xs">Pizzería Artesanal Talca</p>
             </div>
             
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-              <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&q=80&w=800" className="rounded-[40px] shadow-2xl rotate-2" alt="Horno a leña" />
-              <div className="space-y-6">
-                <h3 className="text-4xl font-bebas text-stone-800">El Sueño de la 1 Poniente</h3>
-                <p className="text-stone-600 leading-relaxed font-medium">
-                  Vivazza nació en un pequeño local cerca de la Diagonal en Talca. Lo que comenzó como un experimento entre amigos para crear la masa perfecta, se convirtió en un pilar de la gastronomía urbana maulina.
-                </p>
-                <p className="text-stone-600 leading-relaxed font-medium">
-                  Hoy, mantenemos la misma pasión: ingredientes de ferias locales, agua de nuestra cordillera y una obsesión por el detalle que solo los talquinos entendemos. No somos comida rápida, somos cultura artesanal.
-                </p>
-                <div className="pt-4">
-                  <span className="text-xs font-black uppercase tracking-widest text-[#A61D24]">📍 Calle 1 Poniente #1240, Talca</span>
+            <div className="grid md:grid-cols-2 gap-16 items-center">
+              <div className="relative group">
+                <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&q=80&w=800" className="rounded-[48px] shadow-2xl transition-transform group-hover:-rotate-2 duration-500" alt="Horno a leña" />
+                <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-[#A61D24] rounded-full flex items-center justify-center text-white font-bebas text-2xl rotate-12 shadow-xl border-4 border-white">
+                  EST. 2021
+                </div>
+              </div>
+              <div className="space-y-8">
+                <h3 className="text-5xl font-bebas text-stone-800">El Sueño de la 1 Poniente</h3>
+                <div className="space-y-4 text-stone-600 leading-relaxed font-medium text-lg">
+                  <p>
+                    Vivazza nació en un pequeño garaje cerca de la Diagonal en Talca. Lo que comenzó como un experimento entre amigos para crear la masa perfecta, se convirtió en un pilar de la gastronomía urbana maulina.
+                  </p>
+                  <p>
+                    Hoy, mantenemos la misma obsesión: harinas de molinos locales, agua pura de nuestra cordillera y una fermentación lenta que respeta los tiempos del sabor. No somos comida rápida, somos cultura artesanal horneada a 400 grados.
+                  </p>
+                </div>
+                <div className="pt-6 border-t border-stone-100 flex items-center gap-4">
+                  <div className="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center text-[#A61D24]">
+                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                  </div>
+                  <div>
+                    <p className="text-xs font-black uppercase tracking-widest text-stone-400">Visítanos en Talca</p>
+                    <p className="font-bold text-stone-800">Calle 1 Poniente #1240</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -268,7 +302,7 @@ const App: React.FC = () => {
         )}
       </main>
 
-      {/* Modals & Sidebar */}
+      {/* Modals & Overlays */}
       {selectedPizzaDetails && (
         <PizzaDetailsModal 
           pizza={selectedPizzaDetails}
@@ -299,28 +333,30 @@ const App: React.FC = () => {
         />
       )}
 
-      {/* Mobile Nav Moderno */}
+      {/* Navegación Móvil Estilo Nativo */}
       <nav className="fixed bottom-6 left-6 right-6 z-50 md:hidden">
          <div className="bg-white/90 backdrop-blur-2xl border border-white/50 rounded-[32px] p-2 shadow-2xl flex justify-around items-center h-20">
-            {['menu', 'custom', 'game', 'history'].map((tab) => (
+            {[
+              { id: 'menu', label: 'Menú', icon: <path d="M4 6h16M4 12h16M4 18h16" /> },
+              { id: 'custom', label: 'Armar', icon: <path d="M12 4v16m8-8H4" /> },
+              { id: 'game', label: 'Arcade', icon: <path d="M13 10V3L4 14h7v7l9-11h-7z" /> },
+              { id: 'history', label: 'Historia', icon: <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /> }
+            ].map((tab) => (
               <button 
-                key={tab}
-                onClick={() => setActiveTab(tab as any)}
-                className={`flex-1 flex flex-col items-center justify-center gap-1.5 transition-all ${activeTab === tab ? 'text-[#A61D24]' : 'text-stone-300'}`}
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`flex-1 flex flex-col items-center justify-center gap-1.5 transition-all ${activeTab === tab.id ? 'text-[#A61D24]' : 'text-stone-300'}`}
               >
-                <div className={`p-2 rounded-2xl transition-all ${activeTab === tab ? 'bg-red-50 scale-110' : ''}`}>
-                  {tab === 'menu' && <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6h16M4 12h16M4 18h16" /></svg>}
-                  {tab === 'custom' && <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>}
-                  {tab === 'game' && <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>}
-                  {tab === 'history' && <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>}
+                <div className={`p-2 rounded-2xl transition-all ${activeTab === tab.id ? 'bg-red-50 scale-110' : ''}`}>
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>{tab.icon}</svg>
                 </div>
-                <span className="text-[8px] font-black uppercase tracking-[0.1em]">{tab === 'game' ? 'Arcade' : tab === 'history' ? 'Historia' : tab === 'custom' ? 'Armar' : 'Menú'}</span>
+                <span className="text-[8px] font-black uppercase tracking-[0.1em]">{tab.label}</span>
               </button>
             ))}
          </div>
       </nav>
 
-      {/* Sidebar de Pago */}
+      {/* Sidebar de Checkout */}
       {isCartOpen && (
         <div className="fixed inset-0 z-[100] overflow-hidden">
           <div className="absolute inset-0 bg-stone-900/40 backdrop-blur-md animate-fadeIn" onClick={() => !isCheckingOut && setIsCartOpen(false)}></div>
@@ -331,10 +367,10 @@ const App: React.FC = () => {
                 <div className="absolute inset-0 z-50 bg-white/95 flex flex-col items-center justify-center p-12 text-center space-y-10">
                    <div className="w-24 h-24 bg-[#A61D24] rounded-3xl animate-bounce flex items-center justify-center text-white text-4xl font-bebas shadow-xl">V</div>
                    <div className="space-y-4 w-full">
-                     <h3 className="text-4xl font-bebas text-stone-900 uppercase">Validando Pedido</h3>
+                     <h3 className="text-4xl font-bebas text-stone-900 uppercase tracking-widest">Validando Pedido</h3>
                      <div className="w-full h-2 bg-stone-100 rounded-full overflow-hidden">
                        <div 
-                        className="h-full bg-[#A61D24] transition-all duration-300 ease-out"
+                        className="h-full bg-[#A61D24] transition-all duration-300 ease-out shadow-[0_0_10px_rgba(166,29,36,0.3)]"
                         style={{ width: `${checkoutProgress}%` }}
                        ></div>
                      </div>
@@ -344,7 +380,7 @@ const App: React.FC = () => {
               )}
 
               <div className="p-8 border-b border-stone-100 flex items-center justify-between">
-                <h2 className="text-4xl font-bebas text-stone-900">Tu Carrito</h2>
+                <h2 className="text-4xl font-bebas text-stone-900">Tu Pedido</h2>
                 <button onClick={() => setIsCartOpen(false)} className="bg-stone-50 p-4 rounded-3xl text-stone-400 hover:text-red-500 transition-colors">
                   <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
@@ -354,7 +390,7 @@ const App: React.FC = () => {
                 {cart.length === 0 ? (
                   <div className="text-center py-24 opacity-30">
                     <p className="text-8xl mb-6">🤌</p>
-                    <p className="font-black uppercase tracking-[0.3em] text-[10px]">Tu carrito espera por un sabor real</p>
+                    <p className="font-black uppercase tracking-[0.3em] text-[10px]">Tu carrito está hambriento</p>
                   </div>
                 ) : (
                   cart.map((item) => (
@@ -370,7 +406,7 @@ const App: React.FC = () => {
                           </button>
                         </div>
                         <p className="text-[9px] text-[#A61D24] font-black uppercase tracking-widest">
-                           {item.pizza.calories} kcal • {item.pizza.dough?.name || 'Masa Clásica'}
+                           {item.pizza.calories} kcal • {item.pizza.dough?.name || 'Clásica'}
                         </p>
                         <div className="flex justify-between items-center pt-3">
                           <div className="flex items-center gap-3 bg-stone-50 rounded-xl px-2 py-1 border border-stone-100">
@@ -395,7 +431,7 @@ const App: React.FC = () => {
 
                   {orderType === 'delivery' && (
                     <div className="space-y-2 animate-slideUp">
-                      <label className="text-[9px] uppercase font-black text-stone-400 pl-2">Ubicación en Talca</label>
+                      <label className="text-[9px] uppercase font-black text-stone-400 pl-2">Dirección en Talca</label>
                       <input 
                         type="text" 
                         placeholder="Ej: 2 Norte #1520, Sector Centro" 
@@ -407,7 +443,7 @@ const App: React.FC = () => {
                   )}
 
                   <div className="flex justify-between items-end pt-4">
-                    <span className="font-bebas text-3xl text-stone-400 leading-none">Subtotal</span>
+                    <span className="font-bebas text-3xl text-stone-400 leading-none">Total Final</span>
                     <span className="font-bebas text-5xl text-stone-900 leading-none">${totalCartPrice.toLocaleString('es-CL')}</span>
                   </div>
 
@@ -424,24 +460,24 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Footer Talca */}
+      {/* Footer Estilo Next.js */}
       <footer className="bg-white border-t border-stone-100 py-24">
         <div className="container mx-auto px-6 text-center space-y-12">
            <div className="space-y-4">
               <h2 className="text-8xl font-bebas text-stone-900 tracking-widest">Vivazza</h2>
-              <p className="text-[10px] font-black uppercase tracking-[0.6em] text-[#A61D24]">Pizzería Artesanal • Talca, Chile</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.6em] text-[#A61D24]">Pizzería Artesana • Talca, Chile</p>
            </div>
            
            <div className="flex flex-wrap justify-center gap-12 text-[10px] font-black uppercase tracking-[0.3em] text-stone-400">
-              <a href="https://instagram.com/vivazza_cl" target="_blank" className="hover:text-[#A61D24] transition-colors underline underline-offset-4">Instagram</a>
-              <a href="#" className="hover:text-[#A61D24] transition-colors underline underline-offset-4">TikTok</a>
-              <a href="#" className="hover:text-[#A61D24] transition-colors underline underline-offset-4">Ubícanos</a>
+              <a href="https://instagram.com/vivazza_cl" target="_blank" className="hover:text-[#A61D24] transition-colors underline underline-offset-8 decoration-red-100">Instagram</a>
+              <a href="#" className="hover:text-[#A61D24] transition-colors underline underline-offset-8 decoration-red-100">TikTok</a>
+              <a href="#" className="hover:text-[#A61D24] transition-colors underline underline-offset-8 decoration-red-100">Ubicación</a>
            </div>
 
            <p className="max-w-xl mx-auto text-[10px] font-bold text-stone-300 uppercase tracking-widest leading-loose">
               Orgullosamente Maulinos. Horneando con pasión en Calle 1 Poniente #1240, Talca. <br/>
               &copy; 2024 Vivazza Pizzería. Todos los derechos reservados. <br/>
-              Hecho con amor y mucha harina.
+              Hecho con amor, harina y fuego.
            </p>
         </div>
       </footer>
