@@ -24,6 +24,7 @@ export default function Home() {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [checkoutProgress, setCheckoutProgress] = useState(0);
 
+  // Audio refs con manejo de errores para evitar bloqueos en el render
   const popSound = useRef<HTMLAudioElement | null>(null);
   const successSound = useRef<HTMLAudioElement | null>(null);
 
@@ -129,8 +130,9 @@ export default function Home() {
   if (isLoading) return <LoadingScreen onFinished={() => setIsLoading(false)} />;
 
   return (
-    <div className="min-h-screen pb-24 md:pb-0 overflow-x-hidden">
+    <div className="min-h-screen bg-[#FDFCF0] text-stone-900 selection:bg-[#A61D24]/10 pb-24 md:pb-0 overflow-x-hidden">
       
+      {/* Header Estilo Next.js Premium */}
       <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-2xl border-b border-stone-100 py-4 shadow-sm">
         <div className="container mx-auto px-6 flex items-center justify-between">
           <div className="flex items-center gap-4 cursor-pointer group" onClick={() => setActiveTab('menu')}>
@@ -179,20 +181,17 @@ export default function Home() {
           <div className="section-fade-enter space-y-24">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-12">
               <div className="max-w-3xl space-y-6">
-                <span className="inline-block bg-yellow-400 text-black px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">Abierto en el Maule</span>
+                <span className="inline-block bg-yellow-400 text-black px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">Desde el Corazón del Maule</span>
                 <h2 className="text-7xl md:text-9xl font-bebas leading-[0.85]">Recetas con <br/> <span className="text-[#A61D24] italic">Alma Artesana</span></h2>
                 <p className="text-xl text-stone-500 font-medium leading-relaxed max-w-xl">
                   Harinas de molinos locales, fermentación prolongada y el cariño de nuestra gente en cada porción.
                 </p>
               </div>
-              <CalorieDisplay calories={totalCartCalories} label="Vivazza Tracker" />
+              <CalorieDisplay calories={totalCartCalories} label="Balance Energético" />
             </div>
 
             <div className="space-y-12">
-               <div className="flex items-center gap-6">
-                 <h3 className="text-5xl font-bebas text-stone-900 uppercase">Especialidades</h3>
-                 <div className="h-px flex-grow bg-stone-100"></div>
-               </div>
+               <h3 className="text-5xl font-bebas text-stone-900 uppercase">Especialidades</h3>
                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
                  {SPECIAL_PIZZAS.map(pizza => (
                    <PizzaCard 
@@ -207,10 +206,7 @@ export default function Home() {
             </div>
 
             <div className="space-y-12">
-               <div className="flex items-center gap-6">
-                 <h3 className="text-5xl font-bebas text-stone-400 uppercase tracking-widest">Tradicionales</h3>
-                 <div className="h-px flex-grow bg-stone-100"></div>
-               </div>
+               <h3 className="text-5xl font-bebas text-stone-400 uppercase tracking-widest">Pizzas Tradicionales</h3>
                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                  {TRADITIONAL_PIZZAS.map(pizza => (
                    <PizzaCard 
@@ -281,7 +277,7 @@ export default function Home() {
         )}
       </main>
 
-      {/* Overlays */}
+      {/* Overlays modales */}
       {selectedPizzaDetails && (
         <PizzaDetailsModal 
           pizza={selectedPizzaDetails}
@@ -312,7 +308,7 @@ export default function Home() {
         />
       )}
 
-      {/* Mobile Nav */}
+      {/* Navegación Móvil */}
       <nav className="fixed bottom-6 left-6 right-6 z-50 md:hidden">
          <div className="bg-white/90 backdrop-blur-2xl border border-white/50 rounded-[32px] p-2 shadow-2xl flex justify-around items-center h-20">
             {[
@@ -335,7 +331,7 @@ export default function Home() {
          </div>
       </nav>
 
-      {/* Cart Sidebar */}
+      {/* Sidebar Carrito */}
       {isCartOpen && (
         <div className="fixed inset-0 z-[100] overflow-hidden">
           <div className="absolute inset-0 bg-stone-900/40 backdrop-blur-md animate-fadeIn" onClick={() => !isCheckingOut && setIsCartOpen(false)}></div>
@@ -358,7 +354,7 @@ export default function Home() {
                 <button onClick={() => setIsCartOpen(false)} className="bg-stone-50 p-4 rounded-3xl text-stone-400"><svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg></button>
               </div>
               <div className="flex-grow overflow-y-auto p-8 space-y-8">
-                {cart.length === 0 ? <p className="text-center py-24 opacity-30 font-bebas text-2xl">Carrito vacío</p> : cart.map((item) => (
+                {cart.length === 0 ? <p className="text-center py-24 opacity-30 font-bebas text-2xl">El carrito está vacío</p> : cart.map((item) => (
                     <div key={item.id} className="flex gap-5 group">
                       <div className="w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 shadow-lg border border-stone-100">
                         <img src={item.pizza.image} alt={item.pizza.name} className="w-full h-full object-cover" />
