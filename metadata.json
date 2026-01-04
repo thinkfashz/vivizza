@@ -1,6 +1,6 @@
 {
-  "name": "Fábrica de Pizzas VIVAZZA",
-  "description": "Una pizzería artesanal donde puedes disfrutar de 7 variedades tradicionales o armar tu propia pizza con tus ingredientes favoritos y pedir por WhatsApp.",
+  "name": "Vivazza Talca | Pizza Lab & Arcade",
+  "description": "Aplicación web de pizzería artesanal desarrollada en Python con Reflex, incluyendo sistema de personalización, juego arcade y pedidos vía WhatsApp.",
   "requestFramePermissions": [
     "geolocation"
   ]
