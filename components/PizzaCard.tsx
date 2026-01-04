@@ -1,4 +1,5 @@
 
+'use client';
 import React from 'react';
 import { Pizza } from '../types';
 
@@ -36,19 +37,19 @@ const PizzaCard: React.FC<PizzaCardProps> = ({ pizza, onOrder, onCustomize, onSh
         <div className="space-y-3">
           <button 
             onClick={() => onOrder(pizza)}
-            className="w-full bg-[#A61D24] hover:bg-stone-900 text-white font-black py-4 px-4 rounded-2xl transition-all flex items-center justify-center gap-3 shadow-lg shadow-red-50"
+            className="w-full bg-[#A61D24] hover:bg-stone-900 text-white font-black py-4 px-4 rounded-2xl transition-all flex items-center justify-center gap-3 shadow-lg"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
             </svg>
-            Lo quiero ya
+            Pedir ahora
           </button>
           
           <button 
             onClick={onCustomize}
             className="w-full bg-stone-50 hover:bg-stone-100 text-stone-500 font-black py-3 rounded-2xl transition-all text-[10px] uppercase tracking-widest"
           >
-            Añadir Extras
+            Personalizar
           </button>
         </div>
       </div>
