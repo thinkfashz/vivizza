@@ -1,0 +1,7 @@
+{
+  "name": "Fábrica de Pizzas VIVAZZA",
+  "description": "Una pizzería artesanal donde puedes disfrutar de 7 variedades tradicionales o armar tu propia pizza con tus ingredientes favoritos y pedir por WhatsApp.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
